@@ -19,7 +19,7 @@ $ git checkout develop
 ```
 3. Сборка изображений и контейнеров приложения
 ```sh
-$ `docker compose up -d --build`
+$ docker compose up -d --build
 ```
 
 ## Настройка контейнера node

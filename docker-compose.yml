@@ -1,4 +1,4 @@
-version: "1"
+version: "1.1"
 
 services:
 
@@ -14,13 +14,27 @@ services:
 
   python:
     container_name: python-cloud
-    image: python:latest
+    build: ./backend
     working_dir: /app
     volumes:
       - ./backend:/app
     ports:
       - ${PYTHON_DJANGO_PORT}:3020
-    command: sleep infinity
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      POSTGRES_HOST: "postgresql"
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    command:
+      sh -c "python cloud_dev/manage.py makemigrations &&
+             python cloud_dev/manage.py migrate &&
+             python cloud_dev/manage.py runserver 0.0.0.0:3020"
+    depends_on:
+      - postgresql
+      - redis
 
   postgresql:
     container_name: postgresql
@@ -32,3 +46,10 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: always
+    ports:
+      - ${REDIS_PORT}:6379

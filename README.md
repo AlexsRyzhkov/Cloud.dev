@@ -38,23 +38,11 @@ $ docker compose exec node npm run dev
 ```
 ## Настройка контейнера python
 
-1. Установка всех зависимостей
+1. Сборка контейнера
 
 ```sh
-$ docker compose exec python pip install requirements.txt
+$ docker compose build python-cloud
 ```
-
-2. Запуск среды Django
-
-```sh
-$ docker compose exec python python manage.py runserver "0.0.0.0:3020"
-```
-2. После установки нового пакета выполнить команду
-
-```sh
-$ docker compose exec python pip freeze > requirements.txt
-```
-
 **Note:** Django доступен по url [localhost:3020](http://localhost:3020/):
 
 ## License

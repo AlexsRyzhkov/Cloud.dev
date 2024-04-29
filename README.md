@@ -45,6 +45,15 @@ $ docker compose build python-cloud
 ```
 **Note:** Django доступен по url [localhost:3020](http://localhost:3020/):
 
+2. Генерация документации
+
+```sh
+$ cd cloud_dev/docs
+$ make html
+```
+
+**Note:** Файлы документации располагаются в Cloud.dev/backend/cloud_dev/docs/_build/html 
+
 ## License
 
 This repo available under the [MIT license](https://github.com/skarif2/gmail-signature/blob/master/LICENSE).

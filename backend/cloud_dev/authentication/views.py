@@ -23,7 +23,11 @@ class RegisterView(APIView):
     """
     def post(self, request):
         """
-        Регистрирует пользователя :model:`authentication.User`
+        Регистрирует пользователя :model:`authentication.models.User`
+
+        :param request: POST запрос, в теле запроса (JSON) должны быть поля email, first_name, password, role. Опционально last_name.
+
+        :returns: Статус создания пользователя.
         """
 
         # Валидация логина и пароля
@@ -45,7 +49,7 @@ class LoginView(APIView):
     """
     def post(self, request):
         """
-        Возвращает данные пользователя :model:`authentication.User`
+        Возвращает данные пользователя :model:`authentication.models.User`
         при успешной попытке входа.
 
         :param request: JSON с ключами 'email' и 'password'.
@@ -94,7 +98,7 @@ class RefreshTokenView(APIView):
     """
     def get(self, request):
         """
-        Возвращает данные пользователя :model:`authentication.User`
+        Возвращает данные пользователя :model:`authentication.models.User`
         при успешной валидации refresh токена.
 
         :param request: GET запрос с установленным 'refresh_token' cookie

@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 
 class UserManager(BaseUserManager):
     """
-    Менеджер работы с сущностями :model:`authentication.User`.
+    Менеджер работы с сущностями `authentication.model.User`.
     """
     def create_user(self, email, password=None, **extra_fields):
         """
@@ -13,9 +13,9 @@ class UserManager(BaseUserManager):
         :param str email: Адрес электронной почты пользователя
         :param str password: Пароль пользователя
 
-        :returns: Пользователь с установленными логином и захэшированнным паролем
+        :returns: Пользователь с установленными логином и хэшированным паролем
 
-        :rtype: :model:`authentication.User`
+        :rtype: `authentication.models.User`
         """
         if not email:
             raise ValueError("Адрес электронной почты не может быть пустым")
@@ -32,10 +32,9 @@ class UserManager(BaseUserManager):
         :param str email: Адрес электронной почты пользователя
         :param str password: Пароль пользователя
 
-        :returns: Пользователь с установленными логином и хэшированным паролем
-        и правами супер-пользователя.
+        :returns: Пользователь с установленными логином и хэшированным паролем и правами супер-пользователя.
 
-        :rtype: :model:`authentication.User`
+        :rtype: `authentication.models.User`
         """
         extra_fields.setdefault('is_admin', True)
         extra_fields.setdefault('is_active', True)
@@ -44,24 +43,29 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-class User(AbstractBaseUser, PermissionsMixin):
+class User(AbstractBaseUser):
     """
     Хранит данные одного пользователя.
 
-    Включает:
-    email - Адрес электронной почты пользователя (Уникальное поле).
-    first_name - Имя пользователя.
-    last_name - Фамилия пользователя.
-    role - Роль (0 - Администратор, 1 - Пользователь).
+    :param id: :class:`django.db.models.BigAutoField` Идентификатор пользователя (Первичный ключ)
+    :param email: :class:`django.db.models.EmailField` Адрес электронной почты пользователя (Уникальное поле).
+    :param password: Пароль пользователя хэшированный с помощью SHA256.
+    :param first_name: :class:`django.db.models.TextField` Имя пользователя.
+    :param last_name: :class:`django.db.models.TextField` Фамилия пользователя.
+    :param role: Роль (0 - Администратор, 1 - Пользователь).
+    :param is_superuser: Обладает ли правами супер-пользователь
+    :param last_login: Время последнего входа.
+    :param is_staff: Является ли пользователь сотрудником (системное поле).
+    :param is_active: Является ли аккаунт пользователя активным (системное поле).
     """
-    class Roles(models.IntegerChoices):
+    class _Roles(models.IntegerChoices):
         ADMIN = 0, "Admin"
         USER = 1, "User"
 
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    role = models.IntegerField(choices=Roles, default=Roles.USER)
+    role = models.IntegerField(choices=_Roles, default=_Roles.USER)
     # TO DO
     # profile_picture = models.ForeignKey('cloud.File', models.DO_NOTHING)
 

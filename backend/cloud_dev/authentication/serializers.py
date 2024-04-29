@@ -5,6 +5,8 @@ from .models import User
 class UserRegisterSerializer(serializers.ModelSerializer):
     """
     Сериалайзер регистрации пользователя.
+
+    Выполняет валидацию полей для модели пользователя `authentication.models.User`.
     """
     class Meta:
         model = User
@@ -33,6 +35,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 class UserLoginSerializer(serializers.Serializer):
     """
     Сериалайзер логина пользователя.
+
+    Используется для валидации логина и пароля.
     """
     email = serializers.EmailField(required=True)
     password = serializers.CharField(required=True)

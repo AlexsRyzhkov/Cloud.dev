@@ -10,7 +10,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = User
-        fields = ('id', 'email', 'password', 'first_name', 'last_name', 'role') # Add profile_picture
+        fields = ('id', 'login', 'password', 'first_name', 'last_name', 'role') # Add profile_picture
         write_only_fields = ('password',)
         read_only_fields = ('id',)
 
@@ -19,7 +19,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         Создает пользователя с валидированными данными.
         """
         user = User.objects.create(
-            email=validated_data['email'],
+            login=validated_data['login'],
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
             role=validated_data['role'],
@@ -38,7 +38,7 @@ class UserLoginSerializer(serializers.Serializer):
 
     Используется для валидации логина и пароля.
     """
-    email = serializers.EmailField(required=True)
+    login = serializers.EmailField(required=True)
     password = serializers.CharField(required=True)
 
 

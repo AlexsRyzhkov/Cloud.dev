@@ -7,8 +7,6 @@ interface EnvVariables {
     mode?: BuildMode;
     analyzer?: boolean;
     port?: number;
-    SHOP_REMOTE_URL?: string
-    ADMIN_REMOTE_URL?: string
 }
 
 export default (env: EnvVariables) => {
@@ -19,35 +17,32 @@ export default (env: EnvVariables) => {
         public: path.resolve(__dirname, 'public'),
         src: path.resolve(__dirname, 'src'),
     }
-    const AUTH_REMOTE_URL = env.ADMIN_REMOTE_URL ?? 'http://localhost:3001'
-    const STORE_REMOTE_URL = env.SHOP_REMOTE_URL ?? 'http://localhost:3002'
 
     const config: webpack.Configuration = buildWebpack({
-        port: env.port ?? 3000,
+        port: env.port ?? 3002,
         mode: env.mode ?? 'development',
         paths,
     })
 
     config.plugins.push(new webpack.container.ModuleFederationPlugin({
-        name: 'host',
+        name: 'store',
         filename: 'remoteEntry.js',
-        remotes: {
-            auth: `auth@${AUTH_REMOTE_URL}/remoteEntry.js`,
-            store: `store@${STORE_REMOTE_URL}/remoteEntry.js`,
+        exposes: {
+            './Router': './src/router/Router.tsx',
         },
         shared: {
             ...packageJson.dependencies,
             react: {
                 eager: true,
-                // requiredVersion: packageJson.dependencies['react'],
+                requiredVersion: packageJson.dependencies['react'],
             },
             'react-router-dom': {
                 eager: true,
-                // requiredVersion: packageJson.dependencies['react-router-dom'],
+                requiredVersion: packageJson.dependencies['react-router-dom'],
             },
             'react-dom': {
                 eager: true,
-                // requiredVersion: packageJson.dependencies['react-dom'],
+                requiredVersion: packageJson.dependencies['react-dom'],
             },
         },
     }))

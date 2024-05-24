@@ -79,7 +79,7 @@ class LoginView(APIView):
         user_data = {
             "user_id": user.id,
             "role": user.role,
-            "email": user.email,
+            "login": user.login,
             "first_name": user.first_name,
             "last_name": user.last_name,
             "color": user.color,
@@ -151,7 +151,7 @@ class RefreshTokenView(APIView):
         user_data = {
             "user_id": user.id,
             "role": user.role,
-            "email": user.email,
+            "login": user.login,
             "first_name": user.first_name,
             "last_name": user.last_name
         }

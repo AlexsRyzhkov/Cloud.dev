@@ -12,7 +12,7 @@ class UserManager(BaseUserManager):
     """
     Менеджер работы с сущностями `authentication.model.User`.
     """
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, login, password=None, **extra_fields):
         """
         Создает пользователя с переданными параметрами
 
@@ -23,15 +23,15 @@ class UserManager(BaseUserManager):
 
         :rtype: `authentication.models.User`
         """
-        if not email:
+        if not login:
             raise ValueError("Адрес электронной почты не может быть пустым")
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+        email = self.normalize_email(login)
+        user = self.model(login=email, **extra_fields)
         user.set_password(password)
         user.save()
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_superuser(self, login, password=None, **extra_fields):
         """
         Создает супер-пользователя с переданными параметрами
 
@@ -45,7 +45,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_active', True)
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        return self.create_user(email, password, **extra_fields)
+        return self.create_user(login, password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -67,7 +67,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         ADMIN = 0, "Admin"
         USER = 1, "User"
 
-    email = models.EmailField(unique=True)
+    login = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     role = models.IntegerField(choices=_Roles, default=_Roles.USER)
@@ -81,11 +81,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'login'
     REQUIRED_FIELDS = ['first_name']
 
     def __str__(self):
-        return self.email
+        return self.login
 
     @property
     def full_name(self):

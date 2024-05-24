@@ -1,5 +1,11 @@
+import random
+
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+
+
+def generate_random_color():
+    return '#' + ''.join([random.choice('0123456789abcdef') for _ in range(6)])
 
 
 class UserManager(BaseUserManager):
@@ -36,14 +42,13 @@ class UserManager(BaseUserManager):
 
         :rtype: `authentication.models.User`
         """
-        extra_fields.setdefault('is_admin', True)
         extra_fields.setdefault('is_active', True)
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     """
     Хранит данные одного пользователя.
 
@@ -66,6 +71,7 @@ class User(AbstractBaseUser):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     role = models.IntegerField(choices=_Roles, default=_Roles.USER)
+    color = models.CharField(default=generate_random_color, max_length=7)
     # TO DO
     # profile_picture = models.ForeignKey('cloud.File', models.DO_NOTHING)
 

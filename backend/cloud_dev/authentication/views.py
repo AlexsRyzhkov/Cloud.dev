@@ -1,3 +1,4 @@
+import sys
 import time
 
 from rest_framework import status
@@ -8,6 +9,7 @@ from django.core.cache import cache
 from django.conf import settings
 
 from .models import User
+from storage.models import Drive
 from .jwts import create_access_token, create_refresh_token, get_jwt_payload
 from .serializers import UserRegisterSerializer, UserLoginSerializer
 
@@ -37,7 +39,8 @@ class RegisterView(APIView):
 
         # Создание пользователя
         user = serializer.save()
-        message = {'message': 'Пользователь создан успешно', 'user_id': user.id}
+        drive = Drive.objects.create(user=user)
+        message = {'message': 'Пользователь создан успешно', 'user_id': user.id, 'drive_id': drive.id}
         return Response(message, status=status.HTTP_201_CREATED)
 
 
@@ -78,7 +81,8 @@ class LoginView(APIView):
             "role": user.role,
             "email": user.email,
             "first_name": user.first_name,
-            "last_name": user.last_name
+            "last_name": user.last_name,
+            "color": user.color,
         }
         cache.set(access_token, user_data, access_token_lifetime)
 

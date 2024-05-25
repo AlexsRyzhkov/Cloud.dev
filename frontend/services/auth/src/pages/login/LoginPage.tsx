@@ -9,19 +9,14 @@ import {$api} from "@/http";
 
 function LoginPage() {
     const [isLoading, setLoading]=useState(false)
-
+    const [error, setError]=useState("")
 
     const onSubmit = useCallback(async (data:any)=>{
         try{
             setLoading(true)
-            const result = await $api.post('/api/auth/login/', data, {
-                headers: {
-                    'Access-Control-Allow-Origin' : '*',
-                    'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-                }
-            })
+            await $api.post('/api/auth/login/', data)
         }catch (e){
-            console.log(e)
+            setError(e.response.data.message)
         }finally{
             setLoading(false)
         }
@@ -31,12 +26,12 @@ function LoginPage() {
         <div className='flex flex-col gap-5'>
             <h1 className={'text-3xl font-bold'}>Вход</h1>
             {isLoading ? (
-                <ProgressSpinner style={{width: '20px', height: '20px', stroke: 'white'}} className='m-0 mr-5'/>
+                <ProgressSpinner style={{width: '40px', height: '40px', stroke: 'white'}} className='m-0 mr-5'/>
             ): (
                 <>
                     <Form onSubmit={onSubmit}>
-                        <Input name={'login'} label={'Логин'}/>
-                        <Input name={'password'} label={'Пароль'} isSecure/>
+                        <Input name={'login'} label={'Email'} emailValidation error={error}/>
+                        <Input name={'password'} label={'Пароль'} isSecure error={error}/>
                         <Button className={'flex item-center justify-center'} disabled={isLoading}>
                             Войти
                         </Button>

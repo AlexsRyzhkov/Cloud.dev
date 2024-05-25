@@ -7,7 +7,6 @@ import authRouter from 'auth/Router';
 
 export const router = createBrowserRouter([
     {
-        path: "/",
         element: <App />,
         children: [
             ...storeRouter,

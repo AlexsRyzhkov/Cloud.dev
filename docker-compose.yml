@@ -2,16 +2,6 @@ version: "1.1"
 
 services:
 
-  node:
-    container_name: node-cloud
-    image: node:iron-alpine
-    working_dir: /app
-    volumes:
-      - ./frontend:/app
-    ports:
-      - ${NODE_REACT_PORT}:3030
-    command: sleep infinity
-
   python:
     container_name: python-cloud
     build: ./backend

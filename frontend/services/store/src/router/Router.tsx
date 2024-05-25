@@ -1,24 +1,28 @@
 import {createBrowserRouter} from "react-router-dom";
+import {AppLayout} from "@/layout/AppLayout";
+import {StatisticPage} from "@/pages/statistic/StatisticPage";
+import {SharedPage} from "@/pages/shared/SharedPage";
+import {MyStorePage} from "@/pages/my-store/MyStorePage";
 
 const routes = [
     {
-        element: <h1>Store</h1>,
+        element: <AppLayout/>,
         children: [
             {
                 path: "/",
-                element: <div>my store</div>,
+                element: <MyStorePage/>,
+            },
+            {
+                path: "/:id",
+                element: <MyStorePage/>,
             },
             {
                 path: "/shared",
-                element: <div>shared</div>,
+                element: <SharedPage/>,
             },
             {
                 path: "/statistic",
-                element: <div>statistic</div>,
-            },
-            {
-                path: "/bin",
-                element: <div>bin</div>,
+                element: <StatisticPage/>,
             },
         ]
     },

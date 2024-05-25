@@ -63,6 +63,7 @@ class LoginView(APIView):
         # Валидация логина и пароля
         serializer = UserLoginSerializer(data=request.data)
         if not serializer.is_valid():
+            print(serializer.errors, file=sys.stderr)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         # Аутентификация пользователя
@@ -163,3 +164,15 @@ class RefreshTokenView(APIView):
         response.set_cookie('refresh_token', refresh_token, httponly=True, expires=refresh_token_lifetime)
 
         return response
+
+
+class UserInfoView(APIView):
+    def get(self, request):
+        access_token = request.COOKIES.get('access_token')
+
+        if not access_token or not cache.has_key(access_token):
+            message = {"message": "Пользователь не найден"}
+            return Response(message, status=status.HTTP_404_NOT_FOUND)
+
+        user_data = cache.get(access_token)
+        return Response(user_data, status=status.HTTP_200_OK)

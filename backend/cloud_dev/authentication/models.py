@@ -67,10 +67,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         ADMIN = 0, "Admin"
         USER = 1, "User"
 
-    login = models.EmailField(unique=True)
+    login = models.EmailField(unique=True,
+                              error_messages={
+                                  "login": "Введите адрес электронной почты",
+                                  "unique": "Пользователь с таким логином уже существует",
+                              })
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    role = models.IntegerField(choices=_Roles, default=_Roles.USER)
+    role = models.IntegerField(choices=_Roles, default=_Roles.USER, blank=True, null=True)
     color = models.CharField(default=generate_random_color, max_length=7)
     # TO DO
     # profile_picture = models.ForeignKey('cloud.File', models.DO_NOTHING)

@@ -25,12 +25,6 @@ def ownership_required(view_func):
             message = {"message": "Token is invalid"}
             return Response(message, status=status.HTTP_401_UNAUTHORIZED)
 
-        user = request.data.get('user')
-        user_data = cache.get(access_token)
-        if user_data['user_id'] != user:
-            message = {"message": "Unauthorized"}
-            return Response(message, status=status.HTTP_401_UNAUTHORIZED)
-
         return view_func(self, request, *args, **kwargs)
 
     return wrapper
@@ -65,7 +59,10 @@ def permission_required(read=False, write=False):
 class DriveView(APIView):
     @ownership_required
     def get(self, request):
-        drive = Drive.objects.get(user=request.data['user'])
+        access_token = request.COOKIES.get('access_token')
+        user_data = cache.get(access_token)
+
+        drive = Drive.objects.get(user=user_data['user_id'])
         serializer = DriveSerializer(drive)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

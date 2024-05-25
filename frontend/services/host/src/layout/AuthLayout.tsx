@@ -1,4 +1,6 @@
-import {createContext, FC, PropsWithChildren, useContext, useEffect, useState} from "react";
+import {createContext, useContext, useEffect, useState} from "react";
+import {Outlet, useLocation, useNavigate} from "react-router-dom";
+import {$api} from "../http";
 
 interface IUser{
     user_id: number,
@@ -17,19 +19,35 @@ const AuthContext = createContext({} as IAuthContext)
 
 const useAuthContext = () => useContext(AuthContext)
 
-
-const AuthLayout:FC<PropsWithChildren> = ({children}) => {
-    const [user, _] = useState(null)
+const AuthLayout = () => {
+    const [user, setUser] = useState(null)
+    const navigate = useNavigate();
+    const pathname = useLocation().pathname;
 
     useEffect(() => {
         (async ()=>{
+            try{
+                const response = await $api.get('api/auth/user/')
+                setUser(response.data as IUser)
+                localStorage.setItem('user', JSON.stringify(response.data))
+            }catch (e){
+                setUser(null)
+                localStorage.clear()
+            }finally {
+                if (['/auth/login', '/auth/register'].includes(pathname) && user){
+                    navigate('/')
+                }
 
+                if (!user && !['/auth/login', '/auth/register'].includes(pathname)){
+                    navigate('/auth/login')
+                }
+            }
         })()
-    }, []);
+    }, [pathname]);
 
     return (
         <AuthContext.Provider value={{user}}>
-            {children}
+            <Outlet/>
         </AuthContext.Provider>
     )
 }

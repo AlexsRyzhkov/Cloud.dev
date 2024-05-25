@@ -1,7 +1,7 @@
 import {useCallback, useState} from "react";
 import {Button} from "primereact/button";
 import {ProgressSpinner} from "primereact/progressspinner";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {Form} from "@/components/form/Form";
 import {Input} from "@/components/input/Input";
 import {$api} from "@/http";
@@ -10,11 +10,13 @@ import {$api} from "@/http";
 function LoginPage() {
     const [isLoading, setLoading]=useState(false)
     const [error, setError]=useState("")
+    const navigate = useNavigate()
 
     const onSubmit = useCallback(async (data:any)=>{
         try{
             setLoading(true)
             await $api.post('/api/auth/login/', data)
+            navigate('/')
         }catch (e){
             setError(e.response.data.message)
         }finally{

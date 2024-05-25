@@ -8,21 +8,14 @@ import {BreadCrumb} from "primereact/breadcrumb";
 
 
 const MyStorePage = () => {
-    const params = useParams();
-    console.log(params)
-
-
     const toast = useRef(null);
-
-    const onUpload = () => {
-        toast.current.show({ severity: 'info', summary: 'Success', detail: 'File Uploaded' });
-    };
 
     const fileUploadRef = useRef(null);
 
     const onUploadFile = async (event:any) => {
 
         const file = event.files[0];
+        toast.current.show({ severity: 'info', summary: 'Success', detail: 'File Uploaded' });
 
         fileUploadRef.current.clear()
     };
@@ -49,9 +42,6 @@ const MyStorePage = () => {
                     <Toast ref={toast}></Toast>
                     <FileUpload ref={fileUploadRef} mode="basic" customUpload uploadHandler={onUploadFile} chooseLabel={'Загрузить'} chooseOptions={{className:'bg-[#35B3B5] text-[14px]'}}/>
                 </div>
-            </div>
-            <div>
-                <BreadCrumb model={items} home={home} />
             </div>
             <div>
                 <DiskProvider>

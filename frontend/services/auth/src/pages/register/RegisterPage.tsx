@@ -2,22 +2,25 @@ import {Form} from "@/components/form/Form";
 import {Input} from "@/components/input/Input";
 import {Button} from "primereact/button";
 import {ProgressSpinner} from "primereact/progressspinner";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {useCallback, useRef, useState} from "react";
 import {$api} from "@/http";
 import {Toast} from "primereact/toast";
+import {useToastContext} from "@/layout/AppLayout";
 
 
 function RegisterPage(){
     const [isLoading, setLoading]=useState(false)
     const [error, setError]=useState("")
-    const toast = useRef(null);
+    const navigate = useNavigate()
+    const {toast} = useToastContext()
 
     const onSubmit = useCallback(async (data:any)=>{
         try{
             setLoading(true)
             await $api.post('/api/auth/register/', {...data, role:1})
-            toast.current.show({ severity: 'Wa', summary: 'Info', detail: 'Успешно создан' });
+            toast.current.show({severity:'success', summary: 'Успешно создан', life: 3000});
+            navigate('/auth/login')
         }catch (e){
             setError(e.response.data.login[0]==='user with this login already exists.' ? "Такой пользователь уже существует": "Ошибка сервера")
         }finally{

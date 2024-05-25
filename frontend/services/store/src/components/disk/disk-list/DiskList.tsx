@@ -10,7 +10,8 @@ const DiskList = () => {
     const cm = useRef(null);
     const items = [
         { label: 'Редактировать', icon: 'pi pi-copy' },
-        { label: 'Удалить', icon: 'pi pi-file-edit' }
+        { label: 'Удалить', icon: 'pi pi-file-edit' },
+        { label: 'Скачать', icon: 'pi pi-copy' },
     ];
 
 

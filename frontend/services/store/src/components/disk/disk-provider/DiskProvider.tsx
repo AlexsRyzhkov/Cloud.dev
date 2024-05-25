@@ -1,4 +1,7 @@
-import {createContext, FC, PropsWithChildren, useContext, useState} from "react";
+import {createContext, FC, PropsWithChildren, useContext, useEffect, useState} from "react";
+import {$api} from "@/http";
+import {useParams} from "react-router-dom";
+import { AxiosResponse } from "axios";
 
 interface IFolder {
     id: number,
@@ -27,45 +30,43 @@ const DiskContext = createContext({} as IDiskContext)
 const useDiskContext = () => useContext(DiskContext)
 
 const DiskProvider: FC<PropsWithChildren> = ({children}) => {
+    const {id} = useParams()
 
     const [value, setValue] = useState({
         isLoading: false,
-        folderData: [
-            {
-                "id": 3,
-                "file": "/media/drives/user1/107c2747-284a-4153-97c2-ad1641714ae5_2.jpg",
-                "parent": 1,
-                "name": "Photo",
-                "extension": ".jpg",
-                "is_dir": false
-            },
-            {
-                "id": 4,
-                "file": null,
-                "parent": 1,
-                "name": "Photos",
-                "extension": "",
-                "is_dir": true
-            },
-            {
-                "id": 5,
-                "file": null,
-                "parent": 1,
-                "name": "Photos",
-                "extension": ".docx",
-                "is_dir": false
-            },
-            {
-                "id": 6,
-                "file": null,
-                "parent": 1,
-                "name": "Photos",
-                "extension": ".vfdgb",
-                "is_dir": false
-            },
-        ],
+        folderData: [],
         version: 0
     })
+
+    useEffect(() => {
+        (async () => {
+            let response: AxiosResponse<any, any> = null
+            if (id === ''){
+                setValue(prev => ({...prev, isLoading: true}))
+
+                response = await $api.get('api/storage/drive/')
+
+                response = await $api.get(`api/storage/dir/${response.data.id}`)
+
+                setValue(prev => ({
+                    ...prev, folderData: response?.data.children
+                }))
+            }
+
+            try{
+                response = await $api.get(`api/storage/dir/${id}`)
+
+                setValue(prev => ({
+                    ...prev, folderData: response?.data.children
+                }))
+            }catch (e){
+                console.log(e)
+            }finally {
+                setValue(prev => ({...prev, isLoading: true}))
+            }
+
+        })()
+    }, [value.version]);
 
     return (
         <DiskContext.Provider value={{value, setValue}}>

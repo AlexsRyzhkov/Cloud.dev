@@ -6,13 +6,17 @@ import {Password} from "primereact/password";
 interface IInputPassword {
     name: string,
     label: string,
-    isSecure?: boolean
+    isSecure?: boolean,
+    emailValidation?: boolean
+    error?: string
 }
 
 const Input: FC<IInputPassword> = ({
     name,
     label,
-    isSecure=false
+    isSecure = false,
+    emailValidation = false,
+    error = ''
 }) => {
     const {control} = useFormContext()
 
@@ -22,6 +26,10 @@ const Input: FC<IInputPassword> = ({
             control={control}
             rules={{
                 required: "Не может быть пустым",
+                pattern: {
+                    value: emailValidation ? /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i : undefined,
+                    message: 'Неверный формат email'
+                }
             }}
             render={({field, fieldState}) => {
                 return (
@@ -29,11 +37,11 @@ const Input: FC<IInputPassword> = ({
                         <p>{label}</p>
                         {isSecure ? (
                             <Password {...field} feedback={false} inputClassName='w-full'/>
-                        ): (
+                        ) : (
                             <InputText {...field}/>
                         )}
-                        {fieldState.error && (
-                            <p className='text-red-600'>{fieldState?.error?.message}</p>
+                        {(fieldState.error || error!=='') && (
+                            <p className='text-red-600'>{fieldState?.error?.message || error}</p>
                         )}
                     </div>
                 )

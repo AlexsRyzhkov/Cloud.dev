@@ -16,7 +16,7 @@ class UserManager(BaseUserManager):
         """
         Создает пользователя с переданными параметрами
 
-        :param str email: Адрес электронной почты пользователя
+        :param str login: Адрес электронной почты пользователя
         :param str password: Пароль пользователя
 
         :returns: Пользователь с установленными логином и хэшированным паролем
@@ -35,7 +35,7 @@ class UserManager(BaseUserManager):
         """
         Создает супер-пользователя с переданными параметрами
 
-        :param str email: Адрес электронной почты пользователя
+        :param str login: Адрес электронной почты пользователя
         :param str password: Пароль пользователя
 
         :returns: Пользователь с установленными логином и хэшированным паролем и правами супер-пользователя.
@@ -76,6 +76,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=30)
     role = models.IntegerField(choices=_Roles, default=_Roles.USER, blank=True, null=True)
     color = models.CharField(default=generate_random_color, max_length=7)
+    root_dir = models.ForeignKey("storage.FileSystemElement", models.DO_NOTHING, blank=True, null=True)
     # TO DO
     # profile_picture = models.ForeignKey('cloud.File', models.DO_NOTHING)
 

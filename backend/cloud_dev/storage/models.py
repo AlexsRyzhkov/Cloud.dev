@@ -29,25 +29,13 @@ class FileSystemElement(models.Model):
 
 class DriveManager(models.Manager):
     def create(self, user, **extra_fields):
-        file_system_element = FileSystemElement.objects.create(
-            name=f'user{user.id}',
-            is_dir=True,
-            filepath=f'user{user.id}',
-        )
-        permission = Permission.objects.create(
-            user=user,
-            file=file_system_element,
-            read=True,
-            write=True,
-        )
-        drive = self.model(user=user, root_dir=file_system_element, **extra_fields)
+        drive = self.model(user=user, **extra_fields)
         drive.save()
         return drive
 
 
 class Drive(models.Model):
     user = models.ForeignKey('authentication.User', models.CASCADE)
-    root_dir = models.ForeignKey('FileSystemElement', models.CASCADE)
     max_size = models.IntegerField(default=DEFAULT_DRIVE_SIZE)
     free_size = models.IntegerField(default=DEFAULT_DRIVE_SIZE)
     pdf_count = models.IntegerField(default=0)

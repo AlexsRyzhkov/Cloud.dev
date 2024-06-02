@@ -1,5 +1,3 @@
-import sys
-
 from rest_framework import serializers
 from .models import FileSystemElement, Drive
 
@@ -10,9 +8,7 @@ class FileSystemElementSerializer(serializers.ModelSerializer):
         fields = ['id', 'file', 'parent', 'name', 'extension', 'is_dir']
 
     def create(self, validated_data):
-        parent_id = validated_data['parent']
-        print(parent_id.id, file=sys.stderr)
-        parent = FileSystemElement.objects.get(id=parent_id.id)
+        parent = validated_data['parent']
         validated_data['level'] = parent.level + 1
         validated_data['filepath'] = parent.filepath + '/' + validated_data['name']
         file_system_element = FileSystemElement.objects.create(**validated_data)

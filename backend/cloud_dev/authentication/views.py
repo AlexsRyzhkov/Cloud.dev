@@ -63,7 +63,6 @@ class LoginView(APIView):
         # Валидация логина и пароля
         serializer = UserLoginSerializer(data=request.data)
         if not serializer.is_valid():
-            print(serializer.errors, file=sys.stderr)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         # Аутентификация пользователя
@@ -79,7 +78,7 @@ class LoginView(APIView):
         # Кэширование access токена
         user_data = {
             "user_id": user.id,
-            "role": user.role,
+            "root_dir": user.root_dir.id,
             "login": user.login,
             "first_name": user.first_name,
             "last_name": user.last_name,
@@ -151,7 +150,7 @@ class RefreshTokenView(APIView):
         # Кэширование access токена
         user_data = {
             "user_id": user.id,
-            "role": user.role,
+            "root_dir": user.root_dir.id,
             "login": user.login,
             "first_name": user.first_name,
             "last_name": user.last_name
@@ -167,6 +166,11 @@ class RefreshTokenView(APIView):
 
 
 class UserInfoView(APIView):
+    """
+        View для получения данных пользователя.
+        Поддерживает GET запросы.
+        Доступен по адресу /api/auth/user
+    """
     def get(self, request):
         access_token = request.COOKIES.get('access_token')
 
@@ -176,3 +180,40 @@ class UserInfoView(APIView):
 
         user_data = cache.get(access_token)
         return Response(user_data, status=status.HTTP_200_OK)
+
+
+class Logout(APIView):
+    """
+        View для выхода.
+        Поддерживает GET запросы.
+        Доступен по адресу /api/auth/logout
+    """
+    def get(self, request):
+        access_token = request.COOKIES.get('access_token')
+        refresh_token = request.COOKIES.get('refresh_token')
+
+        if access_token is None:
+            message = {"message": "Token is not found in cookie"}
+            return Response(message, status=status.HTTP_401_UNAUTHORIZED)
+
+        if cache.has_key(access_token):
+            cache.delete(access_token)
+
+        if refresh_token is not None:
+            try:
+                payload = get_jwt_payload(refresh_token)
+                if not cache.has_key(refresh_token):
+                    refresh_token_lifetime = payload["exp"] - time.time()
+                    cache.set(refresh_token, payload["user_id"], refresh_token_lifetime)
+            except Exception as e:
+                message = {"message": "Invalid Refresh Token, " + str(e)}
+                response = Response(message, status=status.HTTP_401_UNAUTHORIZED)
+                response.delete_cookie('access_token')
+                response.delete_cookie('refresh_token')
+                return response
+
+        message = {"message": "Logged out successfully!"}
+        response = Response(message, status=status.HTTP_200_OK)
+        response.delete_cookie('access_token')
+        response.delete_cookie('refresh_token')
+        return response

@@ -3,6 +3,7 @@ import shutil
 import sys
 import time
 
+from django.db.models import F
 from django.http import FileResponse
 from rest_framework import status, viewsets
 from rest_framework.response import Response
@@ -88,9 +89,22 @@ class DirectoryView(APIView):
             message = {"message": serializer.errors}
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
+        serializer.validated_data['parent'] = FileSystemElement.objects.get(id=pk)
         if 'file' in serializer.validated_data:
             name, ext = os.path.splitext(str(serializer.validated_data['file']))
             serializer.validated_data['extension'] = ext
+
+        if 'extension' in serializer.validated_data:
+            drive = Drive.objects.get(user=get_user(request))
+            match serializer.validated_data['extension'].lower():
+                case '.pdf':
+                    drive.pdf_count = F('pdf_count') + 1
+                case '.doc' | '.docx':
+                    drive.doc_count = F('doc_count') + 1
+                case '.png' | '.jpg' | '.jpeg':
+                    drive.img_count = F('img_count') + 1
+            drive.save()
+
         serializer.save()
 
         user = get_user(request)
@@ -139,6 +153,17 @@ class DirectoryView(APIView):
             message = {"message": "Невозможно удалить корневую папку пользователя"}
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
+        if file.extension is not None:
+            drive = Drive.objects.get(user=get_user(request))
+            match file.extension.lower():
+                case '.pdf':
+                    drive.pdf_count = F('pdf_count') - 1
+                case '.doc' | '.docx':
+                    drive.doc_count = F('doc_count') - 1
+                case '.png' | '.jpg' | '.jpeg':
+                    drive.img_count = F('img_count') - 1
+            drive.save()
+
         file.delete()
         message = {"message": "Файл удален"}
         return Response(message, status=status.HTTP_200_OK)
@@ -156,6 +181,8 @@ class DownloadViewSet(viewsets.ReadOnlyModelViewSet):
             media_path = settings.MEDIA_ROOT / 'drives'
             full_path = media_path / instance.filepath
             output_path = media_path / instance.name
+            if not os.path.exists(full_path):
+                os.makedirs(full_path)
             fn = shutil.make_archive(output_path, 'zip', full_path)
             print(fn, file=sys.stderr)
             size = os.path.getsize(fn)

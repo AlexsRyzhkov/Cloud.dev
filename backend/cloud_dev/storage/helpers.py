@@ -7,7 +7,6 @@ from authentication.models import User
 def get_user(request):
     access_token = request.COOKIES.get("access_token")
     user_data = cache.get(access_token)
-    print(user_data, file=sys.stderr)
     user = User.objects.get(id=user_data['user_id'])
     return user
 
